@@ -1,106 +1,118 @@
 /**
- * A simple OpenGL program that draws a colorful cube
- * that rotates as you move the arrow keys.
- *
- * Author: Mihalis Tsoukalos
- * Date: Wednesday 04 June 2014
+ * Simple demonstration of transformations.
  */
-#include <iostream>
+
 #include <GL/glut.h>
 #include <GL/gl.h>
 
-// Rotate X
-GLfloat rX = 0;
-// Rotate Y
-GLfloat rY = 0;
+int rotacao = 0;
+int escala =0;
+int trans =0;
+float ro = 1;
+float es = 1;
+float tr = 0;
+void renderCoordinateAxis()
+{
+	// X axis - green color
+	glColor3f(0, 1, 0);
+	glBegin(GL_LINES);
+		// Left side, negative X
+		glVertex2f(-1.0, 0.0);
+		glVertex2f(0.0, 0.0);
 
-// The coordinates for the vertices of the cube
-GLfloat x = 0.3f;
-GLfloat y = 0.3f;
-GLfloat z = 0.3f;
+		// Right side, positive X
+		glVertex2f(0.0, 0.0);
+		glVertex2f(1.0, 0.0);
+	glEnd();
 
-float x1=-0.0;
-float y1=0.10;
-float escala =1.0;
+	// Y axis - blue color
+	glColor3f(0, 0, 1);
+	glBegin(GL_LINES);
+		// Top side, positive Y
+		glVertex2f(0.0, 0.0);
+		glVertex2f(0.0, 1.0);
+
+		// Bottom side, negative Y
+		glVertex2f(0.0, 0.0);
+		glVertex2f(0.0, -1.0);
+	glEnd();
+}
 
 void display()
 {
-	// Set Background Color
-	glClearColor(0.4f, 0.4f, 0.4f, 1.0f);
-	// Clear screen
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// Clear the screen painting it all with the white color
+	glClearColor(1, 1, 1, 0);
+	glClear(GL_COLOR_BUFFER_BIT);
 
-	// Reset transformations
+	
+	// Inform OpenGL we want to make changes to the modelview matrix
+	glMatrixMode(GL_MODELVIEW);
+
+	// Render the X and Y axis to guide ourselves.
+	renderCoordinateAxis();
 	glLoadIdentity();
 
-	glScalef(escala, escala, 0);
-		
-		glBegin(GL_LINES);
-			glColor3f(0.f, 0.f, 1.f);
-			glVertex3f(x1, y1, 0.f);
-			glVertex3f(x1, -y1, 0.f);
-		glEnd();
-		glBegin(GL_LINES);
-			glColor3f(0.f, 0.f, 1.f);
-			glVertex3f(x1+0.2, y1, 0.f);
-			glVertex3f(x1+0.2, -y1, 0.f);
-		glEnd();
-		glBegin(GL_LINES);
-			glColor3f(0.f, 0.f, 1.f);
-			glVertex3f(x1, y1, 0.f);
-			glVertex3f(x1+0.2, y1, 0.f);
-		glEnd();
-		glBegin(GL_LINES);
-			glColor3f(0.f, 0.f, 1.f);
-			glVertex3f(x1+0.0, -y1, 0.f);
-			glVertex3f(x1+0.2, -y1, 0.f);
-		glEnd();
+	if (rotacao ==1){
+		ro = 5+ ro;
+	}
 
-	glFlush();
+	if (escala == 1 && es < 3){
+		es = es+0.2;
+	} 
+	if (escala == 1 && es> 3){
+		es = 1;
+	}
+	if (trans==1 && tr < 2){
+		tr += 1;	
+	}
+	// Render a red square
+	glColor3f(1, 0, 0);
+	glScalef(es, es, 0);
+	glTranslatef(tr, tr, 0);
+	glRotatef(ro, 0.0f, 0.0f, 1.0f);
+	glRectf(-0.1f, 0.1f, 0.1f, -0.1f);
+	
+
+
+	
+
+
 	glutSwapBuffers();
 }
 
 void keyboard(unsigned char key, int x, int y)
 {
-	//std::cout<<key<<std::endl;
-	if (key == '2') {
-		escala=2;
-	} else if (key == '3') {
-		escala=3;
-	} else if (key == '4') {
-		escala=4;
-	} else if (key == '5') {
-		escala=5;
+		//std::cout<<key<<std::endl;
+	if (key == '1' && rotacao == 0) {
+		rotacao=1;
+	}else{
+		rotacao = 0;
+	}
+	if (key == '2' && trans == 0) {
+		trans=1;
+	}else{
+		trans =0;
+	}
+	if (key == '3' && escala == 0) {
+		escala=1;
+	} else{
+		escala = 0;
 	}
 
 	// Request display update
 	glutPostRedisplay();
 }
 
-
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
-	// Initialize GLUT and process user parameters
 	glutInit(&argc, argv);
-
-	// Request double buffered true color window with Z-buffer
-	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-
-	glutInitWindowSize(700, 700);
-	glutInitWindowPosition(100, 100);
-
-	// Create window
-	glutCreateWindow("OpenGL Cube");
-
-	// Enable Z-buffer depth test
-	glEnable(GL_DEPTH_TEST);
-
-	// Callback functions
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+	glutInitWindowSize(800, 800);
+	glutCreateWindow("Transformation - Simple");
 	glutDisplayFunc(display);
+	glutIdleFunc(display);
 	glutKeyboardFunc(keyboard);
 
-	// Pass control to GLUT for events
 	glutMainLoop();
-
 	return 0;
 }
